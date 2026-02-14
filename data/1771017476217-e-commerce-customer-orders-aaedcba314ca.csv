@@ -1,0 +1,13 @@
+order_id,customer_age,gender,country,product_category,order_value,discount_pct,payment_method,delivery_days,returned
+1001,28,Female,United States,Electronics,799.99,10,Credit Card,3,false
+1002,45,Male,Canada,Home,129.50,0,PayPal,5,false
+1003,34,Female,India,Fashion,59.99,15,Debit Card,7,true
+1004,52,Male,United States,Electronics,1199.00,5,Credit Card,2,false
+1005,23,Female,United Kingdom,Beauty,24.99,20,PayPal,6,true
+1006,41,Male,Germany,Home,349.00,,Credit Card,4,false
+1007,36,Female,India,Fashion,89.50,10,UPI,8,false
+1008,29,Male,United States,Sports,199.99,0,Debit Card,3,false
+1009,61,Female,Canada,Health,49.99,5,Credit Card,5,false
+1010,33,Male,Australia,Electronics,649.00,12,PayPal,9,true
+1011,27,Female,India,Beauty,19.99,,UPI,6,false
+1012,48,Male,United States,Home,459.00,8,Credit Card,4,false

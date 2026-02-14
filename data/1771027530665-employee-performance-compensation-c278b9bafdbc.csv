@@ -1,0 +1,13 @@
+employee_id,age,department,role,years_at_company,monthly_salary,performance_score,promotions,remote_worker,attrition
+E001,29,Engineering,Software Engineer,3,7200,4.5,1,true,false
+E002,41,Sales,Account Manager,7,6800,3.8,2,false,false
+E003,35,Engineering,DevOps Engineer,5,8100,4.2,1,true,false
+E004,26,Marketing,Content Specialist,1,4200,3.5,0,true,true
+E005,50,HR,HR Manager,12,9000,4.7,3,false,false
+E006,31,Engineering,Software Engineer,4,7500,4.0,1,true,false
+E007,45,Sales,Sales Director,10,10500,4.9,4,false,false
+E008,38,Marketing,SEO Analyst,6,5600,3.6,1,true,false
+E009,28,Engineering,Data Analyst,2,6900,,0,true,true
+E010,54,Finance,Finance Manager,15,11000,4.8,3,false,false
+E011,33,HR,Recruiter,4,5200,3.9,1,true,false
+E012,47,Engineering,Engineering Manager,11,9800,4.6,2,false,false
