@@ -33,7 +33,8 @@ model Dataset {
   id        String        @id @default(cuid())
   userId    String
   name      String
-  filePath  String
+  filePath  String        @default("")
+  rawData   String?
   status    DatasetStatus @default(PENDING)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt

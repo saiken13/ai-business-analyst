@@ -1,6 +1,5 @@
 // lib/analyticsClient.ts
-import fs from "fs/promises"
-import path from "path"
+// Pure JS implementation - no Python service needed, works on Vercel
 
 export type AnalysisResult = {
   columns: Array<{
@@ -13,25 +12,41 @@ export type AnalysisResult = {
   }>
 }
 
-export async function requestAnalysis(filePathFromDb: string): Promise<AnalysisResult> {
-  const absPath = path.isAbsolute(filePathFromDb)
-    ? filePathFromDb
-    : path.join(process.cwd(), filePathFromDb)
+function detectDelimiter(headerLine: string): string {
+  if (headerLine.includes("\t")) return "\t"
+  if (headerLine.includes(";")) return ";"
+  return ","
+}
 
-  const csvContent = await fs.readFile(absPath, "utf8")
+export async function requestAnalysis(csvContent: string): Promise<AnalysisResult> {
+  const lines = csvContent.split(/\r?\n/).filter(Boolean)
+  if (lines.length < 2) return { columns: [] }
 
-  const baseUrl = process.env.ANALYTICS_SERVICE_URL || "http://localhost:8000"
+  const delimiter = detectDelimiter(lines[0])
+  const headers = lines[0].split(delimiter).map((h) => h.trim().replace(/^["']|["']$/g, ""))
+  const dataRows = lines.slice(1).map((line) =>
+    line.split(delimiter).map((v) => v.trim().replace(/^["']|["']$/g, ""))
+  )
+  const totalRows = dataRows.length
 
-  const res = await fetch(`${baseUrl}/analyze`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ csvContent }),
+  const columns = headers.map((name, colIdx) => {
+    const allValues = dataRows.map((row) => row[colIdx] ?? "")
+    const missingCount = allValues.filter((v) => v === "" || v === "null" || v === "NULL" || v === "N/A").length
+    const missingPct = totalRows > 0 ? (missingCount / totalRows) * 100 : 0
+
+    const nonEmpty = allValues.filter((v) => v !== "" && v !== "null" && v !== "NULL" && v !== "N/A")
+    const numericValues = nonEmpty.map((v) => parseFloat(v)).filter((v) => !isNaN(v) && isFinite(v))
+    const isNumeric = nonEmpty.length > 0 && numericValues.length / nonEmpty.length >= 0.7
+
+    if (isNumeric && numericValues.length > 0) {
+      const min = Math.min(...numericValues)
+      const max = Math.max(...numericValues)
+      const mean = numericValues.reduce((sum, v) => sum + v, 0) / numericValues.length
+      return { name, type: "number", missingPct, min, max, mean: parseFloat(mean.toFixed(4)) }
+    }
+
+    return { name, type: "string", missingPct, min: null, max: null, mean: null }
   })
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "")
-    throw new Error(`Analytics service failed (${res.status}): ${text}`)
-  }
-
-  return (await res.json()) as AnalysisResult
+  return { columns }
 }
