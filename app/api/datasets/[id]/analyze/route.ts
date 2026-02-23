@@ -9,14 +9,13 @@ import { generateInsights } from "@/lib/openaiService"
 export const runtime = "nodejs"
 
 function detectDelimiter(headerLine: string) {
-  if (headerLine.includes("	")) return "	"
+  if (headerLine.includes("\t")) return "\t"
   if (headerLine.includes(";")) return ";"
   return ","
 }
 
 function parseCsvPreview(raw: string, maxRows = 25) {
-  const lines = raw.split(/?
-/).filter(Boolean)
+  const lines = raw.split(/\r?\n/).filter(Boolean)
   if (lines.length === 0) return { headers: [], rows: [], delimiter: "," }
   const delimiter = detectDelimiter(lines[0])
   const headers = lines[0].split(delimiter).map((h) => h.trim())
@@ -50,14 +49,13 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
 
     const raw = rawCsvInsight.text
     const preview = parseCsvPreview(raw)
-    const rowCountApprox = Math.max(0, raw.split(/?
-/).filter(Boolean).length - 1)
+    const rowCountApprox = Math.max(0, raw.split(/\r?\n/).filter(Boolean).length - 1)
 
     const previewObj = {
       summary: `Dataset "${dataset.name}" loaded successfully.`,
       rowCountApprox,
       columnCount: preview.headers.length,
-      delimiter: preview.delimiter === "	" ? "TAB" : preview.delimiter,
+      delimiter: preview.delimiter === "\t" ? "TAB" : preview.delimiter,
       headers: preview.headers,
       sampleRows: preview.rows,
     }
